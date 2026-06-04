@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Crypto Intelligence Hub</title>
+<script src="https://cdn.jsdelivr.net/npm/tsparticles@3/tsparticles.bundle.min.js"></script>
+<script src="https://s3.tradingview.com/tv.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:Arial,sans-serif;background:#050814;color:#fff;overflow-x:hidden}
+#particles-js{position:fixed;inset:0;z-index:-1}
+.container{max-width:1280px;margin:auto;padding:20px}
+.hero{text-align:center;padding:100px 20px}
+.hero h1{font-size:clamp(48px,8vw,96px)}
+.glow{color:#67e8f9;text-shadow:0 0 25px #22d3ee}
+.card{
+background:rgba(15,23,42,.55);
+backdrop-filter:blur(16px);
+border:1px solid rgba(255,255,255,.08);
+border-radius:24px;
+padding:24px;
+box-shadow:0 0 30px rgba(34,211,238,.08);
+}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px}
+.section{padding:50px 0}
+.big{font-size:40px;font-weight:bold}
+.feed div{padding:12px;border-bottom:1px solid #24304d}
+.ticker{overflow:hidden;white-space:nowrap}
+.ticker-track{display:inline-block;animation:ticker 25s linear infinite}
+.ticker span{display:inline-block;padding:0 35px;color:#67e8f9}
+@keyframes ticker{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+table{width:100%;border-collapse:collapse}
+th,td{padding:10px;border-bottom:1px solid #24304d;text-align:left}
+.btn{
+display:inline-block;
+padding:22px 45px;
+background:#0ea5e9;
+border-radius:999px;
+text-decoration:none;
+color:#fff;
+font-size:20px;
+font-weight:bold
+}
+.cta{text-align:center;padding:100px 20px}
+@media(max-width:768px){iframe{height:420px!important}}
+
+.wallet-link{color:#67e8f9;text-decoration:none}
+.wallet-link:hover{text-decoration:underline}
+.exchange-logo{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px;background:#67e8f9}
+.whale-scroll{max-height:260px;overflow:hidden;position:relative}
+.whale-scroll .feed{animation:scrollWhale 18s linear infinite}
+@keyframes scrollWhale{0%{transform:translateY(0)}100%{transform:translateY(-40%)}}
+.side-alert{position:fixed;right:12px;top:120px;width:260px;z-index:50}
+.fng{width:180px;height:180px;border-radius:50%;margin:auto;background:conic-gradient(#22c55e 0 72%,#1f2937 72% 100%);display:flex;align-items:center;justify-content:center}
+.fng span{font-size:42px;font-weight:bold}
+
+</style>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
+
+<style id="mobile-upgrade">
+@media (max-width:768px){
+
+.hero{padding:50px 16px !important;}
+.hero h1{font-size:32px !important;line-height:1.2;}
+.metric,.big{font-size:42px !important;}
+
+.grid{
+display:grid !important;
+grid-template-columns:1fr 1fr !important;
+gap:12px !important;
+}
+
+table{min-width:700px;}
+.table-wrap{
+overflow-x:auto;
+-webkit-overflow-scrolling:touch;
+}
+
+#heatmap{height:260px !important;}
+
+.side-alert{
+position:static !important;
+width:100% !important;
+margin-top:20px !important;
+}
+
+.tradingview-widget-container,
+iframe[src*="tradingview"]{
+height:280px !important;
+}
+
+.btn{
+position:fixed;
+left:12px;
+right:12px;
+bottom:12px;
+z-index:9999;
+text-align:center;
+}
+
+body{
+padding-bottom:90px !important;
+}
+
+.whale-item{
+display:flex;
+flex-direction:column;
+gap:4px;
+}
+
+}
+</style>
+
+
+<style id="mobile-force-fix">
+@media screen and (max-width:768px){
+
+.container{
+width:100% !important;
+padding:0 12px !important;
+}
+
+.hero{
+padding:40px 12px !important;
+text-align:center !important;
+}
+
+.hero h1,
+.hero h2{
+font-size:28px !important;
+line-height:1.2 !important;
+}
+
+.big{
+font-size:28px !important;
+}
+
+.grid{
+display:grid !important;
+grid-template-columns:1fr !important;
+gap:10px !important;
+}
+
+.card{
+padding:14px !important;
+border-radius:14px !important;
+margin-bottom:10px !important;
+}
+
+table{
+display:block !important;
+overflow-x:auto !important;
+white-space:nowrap !important;
+}
+
+#heatmap{
+height:220px !important;
+}
+
+.side-alert{
+display:none !important;
+}
+
+iframe,
+.tradingview-widget-container{
+height:260px !important;
+max-width:100% !important;
+}
+
+.btn{
+display:inline-block !important;
+position:static !important;
+width:auto !important;
+margin-top:20px !important;
+}
+
+body{
+padding-bottom:0 !important;
+}
+
+}
+</style>
+
+
+<style id="pro-mobile-layout-fix">
+@media (max-width:768px){
+
+/* TradingView */
+.tradingview-widget-container,
+.tradingview-widget-container iframe{
+height:320px !important;
+min-height:320px !important;
+max-height:320px !important;
+}
+
+.card:has(.tradingview-widget-container){
+padding-bottom:10px !important;
+}
+
+/* Heatmap */
+#heatmap{
+height:220px !important;
+}
+
+/* Reduce oversized cards */
+.card{
+margin-bottom:12px !important;
+padding:12px !important;
+}
+
+/* Top market cap table */
+.table-wrap{
+overflow-x:auto !important;
+}
+
+table{
+font-size:13px !important;
+min-width:560px !important;
+}
+
+/* tighter spacing */
+h2{
+margin-bottom:12px !important;
+}
+
+section{
+margin-bottom:18px !important;
+}
+}
+</style>
+
+</head>
+<body>
+
+<div id="particles-js"></div>
+
+<div class="hero">
+<div class="container">
+<div style="margin-bottom:18px;font-size:14px;letter-spacing:4px;color:#67e8f9;font-weight:bold;">CHAINSCOPE</div>
+<h2 style="font-size:clamp(24px,3vw,38px);margin-bottom:20px;">Real-Time On-Chain Intelligence</h2>
+<h1><span class="glow" id="moneyflow">$347,892,413</span></h1>
+<div style="margin-top:10px;font-size:22px;">Assets Under Monitoring</div>
+<p style="margin-top:20px;opacity:.8;max-width:900px;margin-left:auto;margin-right:auto;">Track Smart Money, Whale Activity, Capital Flows and Market Sentiment Across Major Crypto Assets.</p>
+<div style="margin-top:12px;font-size:13px;opacity:.6;">Updated 12 seconds ago</div>
+</div>
+</div>
+
+<div class="container">
+
+<div class="section">
+<div class="grid">
+<div class="card"><div class="big">72</div>Fear & Greed</div>
+<div class="card"><div class="big">3241</div>Active Addresses</div>
+<div class="card"><div class="big">187</div>Market Signals</div>
+<div class="card"><div class="big">+245M</div>USDT Netflow</div>
+</div>
+</div>
+
+<div class="section">
+<h2>⚡ Live Trade Feed</h2><br>
+<div class="card">
+<div class="ticker">
+<div class="ticker-track">
+<span>Binance BTC +$42.3M · 6m ago</span>
+<span>Coinbase ETH +$18.7M · 11m ago</span>
+<span>OKX SOL +$6.1M · 14m ago</span>
+<span>Bybit TRX +$3.4M · 17m ago</span>
+<span>Whale PEPE +$2.8M · 21m ago</span>
+<span>Whale DOGE +$1.6M · 26m ago</span>
+<span>Binance BTC +$42.3M · 6m ago</span>
+<span>Coinbase ETH +$18.7M · 11m ago</span>
+<span>OKX SOL +$6.1M · 14m ago</span>
+<span>Bybit TRX +$3.4M · 17m ago</span>
+</div>
+</div>
+</div>
+</div>
+
+<div class="section">
+<h2>📈 TradingView</h2><br>
+<div class="card">
+<div id="tv_chart" style="height:600px"></div>
+</div>
+</div>
+
+<div class="section">
+<h2>🐋 Whale Activity</h2><br>
+<div class="card feed">
+<div><a class='wallet-link' href='#'>0x8F3A...92D1</a> → <span class='exchange-logo'></span>Binance · <span class='timeago' data-min='7'>7 min ago</span> · 1,200 BTC ($130M)</div>
+<div><a class='wallet-link' href='#'>0x71BC...4F82</a> → <span class='exchange-logo'></span>Coinbase · <span class='timeago' data-min='12'>12 min ago</span> · 8,500 ETH ($24M)</div>
+<div>TJxP...K9Qa → Bybit · 18 min ago · 12M USDT</div>
+<div>bc1q...8k3v → Kraken · 24 min ago · 890 BTC</div>
+<div>TXr7...Pq1Z → OKX · 31 min ago · 15M USDT</div>
+</div>
+</div>
+
+<div class="section">
+<h2>🔥 Sector Performance</h2><br>
+<div class="grid">
+<div class="card">AI +17.2%</div>
+<div class="card">MEME +12.4%</div>
+<div class="card">RWA +8.8%</div>
+<div class="card">DeFi +6.9%</div>
+</div>
+</div>
+
+<div class="section">
+<h2>🚀 Market Leaders</h2><br>
+<div class="grid">
+<div class="card">BTC +2.4%</div>
+<div class="card">ETH +1.8%</div>
+<div class="card">SOL +5.7%</div>
+<div class="card">TRX +4.1%</div>
+<div class="card">PEPE +18.7%</div>
+<div class="card">DOGE +9.4%</div>
+</div>
+</div>
+
+<div class="section">
+<h2>💰 Capital Flows</h2><br>
+<div class="grid">
+<div class="card">BTC +$182M Net Inflow</div>
+<div class="card">ETH +$74M Net Inflow</div>
+<div class="card">TRX +$29M Net Inflow</div>
+<div class="card">Meme Sector +$41M Net Inflow</div>
+</div>
+</div>
+
+<div class="section">
+<h2>🏆 Top Performing Assets</h2><br>
+<div class="grid">
+<div class="card">PEPE<br><strong>+287%</strong><br><small>30D Performance</small></div>
+<div class="card">WIF<br><strong>+156%</strong><br><small>Volume Surge</small></div>
+<div class="card">BONK<br><strong>+112%</strong><br><small>Liquidity Growth</small></div>
+<div class="card">FLOKI<br><strong>+98%</strong><br><small>Market Momentum</small></div>
+</div>
+</div>
+
+<div class="section">
+<h2>🗺️ Market Heatmap</h2><br>
+<div class="card"><div id="heatmap" style="height:420px"></div></div>
+</div>
+
+<div class="section">
+<h2>📊 Top 20 Market Cap</h2><br>
+<div class="card">
+<table id="coins">
+<tr><th>#</th><th>Coin</th><th>Price</th><th>24h</th><th>Market Cap</th></tr>
+</table>
+</div>
+</div>
+
+<div class="section">
+<h2>📡 Market Signals</h2><br>
+<div class="card feed">
+<div>Binance Spot Inflow Detected · BTC · 09:01 UTC</div>
+<div>Whale Accumulation Detected · SOL · 09:08 UTC</div>
+<div>Exchange Outflow Surge · ETH · 09:15 UTC</div>
+<div>Smart Money Entry · PEPE · 09:31 UTC</div>
+<div>Liquidity Expansion · TRX · 09:40 UTC</div>
+</div>
+</div>
+
+</div>
+
+<div class="cta">
+<a href="#" class="btn">Access Intelligence Dashboard</a>
+<div style="max-width:1000px;margin:80px auto 0;text-align:left;opacity:.85;">
+<hr style="border-color:#24304d;margin-bottom:30px;">
+<h3>Coverage</h3>
+<p>BTC · ETH · SOL · TRX · DOGE · PEPE</p>
+<hr style="border-color:#24304d;margin:30px 0;">
+<h3>Data Sources</h3>
+<p>Market Data</p>
+<p>On-Chain Activity</p>
+<p>Exchange Flows</p>
+<p>Whale Tracking</p>
+<hr style="border-color:#24304d;margin:30px 0;">
+<h3>Last Updated</h3>
+<p>2026-06-04 03:21 UTC</p>
+</div>
+
+<script>
+tsParticles.load("particles-js",{
+particles:{number:{value:80},color:{value:"#22d3ee"},
+links:{enable:true,color:"#22d3ee",opacity:.2},
+move:{enable:true,speed:1},size:{value:2}}
+});
+
+new TradingView.widget({
+container_id:"tv_chart",
+autosize:true,
+symbol:"BINANCE:BTCUSDT",
+interval:"60",
+theme:"dark",
+style:"1"
+});
+
+const names=["BTC","ETH","XRP","BNB","SOL","DOGE","TRX","ADA","SUI","LINK","PEPE","WIF","AVAX","TON","DOT","UNI","APT","ARB","OP","NEAR"];
+for(let i=0;i<20;i++){
+coins.innerHTML += `<tr><td>${i+1}</td><td>${names[i]}</td><td>${(Math.random()*20-10).toFixed(2)}%</td></tr>`;
+}
+
+let value=347892413;
+setInterval(()=>{
+value += Math.floor(Math.random()*50000);
+moneyflow.innerText="$"+value.toLocaleString();
+},1500);
+</script>
+
+
+<div class="side-alert card">
+<h3>Whale Alert</h3>
+<p>🐋 Binance +$42.3M BTC</p>
+<p>🐋 Coinbase +$18.7M ETH</p>
+<p>🐋 OKX +$6.1M SOL</p>
+<p>🐋 Bybit +$3.4M TRX</p>
+</div>
+<script>
+setInterval(()=>{
+document.querySelectorAll('.timeago').forEach(el=>{
+let n=parseInt(el.dataset.min||'7');
+n++; el.dataset.min=n; el.textContent=n+' min ago';
+});
+},60000);
+</script>
+
+<script>
+async function loadTop100(){
+ try{
+ const r=await fetch('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=100&page=1');
+ const data=await r.json();
+ const table=document.getElementById('coins');
+ table.innerHTML='<tr><th>#</th><th>Coin</th><th>Price</th><th>24h</th><th>Market Cap</th></tr>';
+ data.slice(0,100).forEach((c,i)=>{
+ table.innerHTML+=`<tr><td>${i+1}</td><td>${c.symbol.toUpperCase()}</td><td>$${c.current_price}</td><td>${Number(c.price_change_percentage_24h||0).toFixed(2)}%</td><td>$${Math.round(c.market_cap/1e9)}B</td></tr>`;
+ });
+ initHeatmap(data.slice(0,20));
+ }catch(e){console.log(e)}
+}
+
+async function loadFNG(){
+ try{
+ const r=await fetch('https://api.alternative.me/fng/?limit=1');
+ const d=await r.json();
+ const v=d.data[0].value;
+ const el=document.querySelector('.big');
+ if(el) el.textContent=v;
+ }catch(e){}
+}
+
+function initHeatmap(data){
+ const chart=echarts.init(document.getElementById('heatmap'));
+ chart.setOption({
+  tooltip:{},
+  series:[{
+   type:'treemap',
+   data:data.map(x=>({
+     name:x.symbol.toUpperCase(),
+     value:x.market_cap,
+   }))
+  }]
+ });
+}
+
+loadTop100();
+loadFNG();
+</script>
+
+</body>
+
+</html>
